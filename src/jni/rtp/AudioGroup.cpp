@@ -808,9 +808,14 @@ bool AudioGroup::DeviceThread::threadLoop()
     sp<AudioTrack> track = new AudioTrack();
     AudioRecord record;
     if (track->set(AUDIO_STREAM_VOICE_CALL, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
-                AUDIO_CHANNEL_OUT_MONO, output) != NO_ERROR ||
+                AUDIO_CHANNEL_OUT_MONO, output, AUDIO_OUTPUT_FLAG_NONE, NULL /*callback_t*/,
+                NULL /*user*/, 0 /*notificationFrames*/, 0 /*sharedBuffer*/,
+                false /*threadCanCallJava*/, 0 /*sessionId*/,
+                AudioTrack::TRANSFER_OBTAIN) != NO_ERROR ||
             record.set(AUDIO_SOURCE_VOICE_COMMUNICATION, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
-                AUDIO_CHANNEL_IN_MONO, input) != NO_ERROR) {
+                AUDIO_CHANNEL_IN_MONO, input, NULL /*callback_t*/, NULL /*user*/,
+                0 /*notificationFrames*/, false /*threadCanCallJava*/, 0 /*sessionId*/,
+                AudioRecord::TRANSFER_OBTAIN) != NO_ERROR) {
         ALOGE("cannot initialize audio device");
         return false;
     }
@@ -856,6 +861,7 @@ bool AudioGroup::DeviceThread::threadLoop()
     if (mode != MUTED) {
         record.start();
         int16_t one;
+        // FIXME this may not work any more
         record.read(&one, sizeof(one));
     }
     track->start();
