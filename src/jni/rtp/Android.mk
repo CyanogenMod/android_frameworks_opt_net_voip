@@ -36,6 +36,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libnativehelper \
 	libcutils \
 	libutils \
+	liblog \
 	libmedia \
 	libstagefright_amrnb_common
 
