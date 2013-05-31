@@ -805,16 +805,16 @@ bool AudioGroup::DeviceThread::threadLoop()
     ALOGD("adjusted frame count: output %d, input %d", output, input);
 
     // Initialize AudioTrack and AudioRecord.
-    AudioTrack track;
+    sp<AudioTrack> track = new AudioTrack();
     AudioRecord record;
-    if (track.set(AUDIO_STREAM_VOICE_CALL, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
+    if (track->set(AUDIO_STREAM_VOICE_CALL, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_OUT_MONO, output) != NO_ERROR ||
             record.set(AUDIO_SOURCE_VOICE_COMMUNICATION, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_IN_MONO, input) != NO_ERROR) {
         ALOGE("cannot initialize audio device");
         return false;
     }
-    ALOGD("latency: output %d, input %d", track.latency(), record.latency());
+    ALOGD("latency: output %d, input %d", track->latency(), record.latency());
 
     // Give device socket a reasonable buffer size.
     setsockopt(deviceSocket, SOL_SOCKET, SO_RCVBUF, &output, sizeof(output));
@@ -848,7 +848,7 @@ bool AudioGroup::DeviceThread::threadLoop()
         // Create local echo suppressor if platform AEC cannot be used.
         if (aec == NULL) {
              echo = new EchoSuppressor(sampleCount,
-                                       (track.latency() + record.latency()) * sampleRate / 1000);
+                                       (track->latency() + record.latency()) * sampleRate / 1000);
         }
     }
     // Start AudioRecord before AudioTrack. This prevents AudioTrack from being
@@ -858,7 +858,7 @@ bool AudioGroup::DeviceThread::threadLoop()
         int16_t one;
         record.read(&one, sizeof(one));
     }
-    track.start();
+    track->start();
 
     while (!exitPending()) {
         int16_t output[sampleCount];
@@ -876,12 +876,12 @@ bool AudioGroup::DeviceThread::threadLoop()
                 AudioTrack::Buffer buffer;
                 buffer.frameCount = toWrite;
 
-                status_t status = track.obtainBuffer(&buffer, 1);
+                status_t status = track->obtainBuffer(&buffer, 1);
                 if (status == NO_ERROR) {
                     int offset = sampleCount - toWrite;
                     memcpy(buffer.i8, &output[offset], buffer.size);
                     toWrite -= buffer.frameCount;
-                    track.releaseBuffer(&buffer);
+                    track->releaseBuffer(&buffer);
                 } else if (status != TIMED_OUT && status != WOULD_BLOCK) {
                     ALOGE("cannot write to AudioTrack");
                     goto exit;
