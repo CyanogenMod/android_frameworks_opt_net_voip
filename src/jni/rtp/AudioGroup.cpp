@@ -806,20 +806,20 @@ bool AudioGroup::DeviceThread::threadLoop()
 
     // Initialize AudioTrack and AudioRecord.
     sp<AudioTrack> track = new AudioTrack();
-    AudioRecord record;
+    sp<AudioRecord> record = new AudioRecord();
     if (track->set(AUDIO_STREAM_VOICE_CALL, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_OUT_MONO, output, AUDIO_OUTPUT_FLAG_NONE, NULL /*callback_t*/,
                 NULL /*user*/, 0 /*notificationFrames*/, 0 /*sharedBuffer*/,
                 false /*threadCanCallJava*/, 0 /*sessionId*/,
                 AudioTrack::TRANSFER_OBTAIN) != NO_ERROR ||
-            record.set(AUDIO_SOURCE_VOICE_COMMUNICATION, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
+            record->set(AUDIO_SOURCE_VOICE_COMMUNICATION, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_IN_MONO, input, NULL /*callback_t*/, NULL /*user*/,
                 0 /*notificationFrames*/, false /*threadCanCallJava*/, 0 /*sessionId*/,
                 AudioRecord::TRANSFER_OBTAIN) != NO_ERROR) {
         ALOGE("cannot initialize audio device");
         return false;
     }
-    ALOGD("latency: output %d, input %d", track->latency(), record.latency());
+    ALOGD("latency: output %d, input %d", track->latency(), record->latency());
 
     // Give device socket a reasonable buffer size.
     setsockopt(deviceSocket, SOL_SOCKET, SO_RCVBUF, &output, sizeof(output));
@@ -840,8 +840,8 @@ bool AudioGroup::DeviceThread::threadLoop()
                                     0,
                                     0,
                                     0,
-                                    record.getSessionId(),
-                                    record.getInput());
+                                    record->getSessionId(),
+                                    record->getInput());
             status_t status = aec->initCheck();
             if (status == NO_ERROR || status == ALREADY_EXISTS) {
                 aec->setEnabled(true);
@@ -853,16 +853,16 @@ bool AudioGroup::DeviceThread::threadLoop()
         // Create local echo suppressor if platform AEC cannot be used.
         if (aec == NULL) {
              echo = new EchoSuppressor(sampleCount,
-                                       (track->latency() + record.latency()) * sampleRate / 1000);
+                                       (track->latency() + record->latency()) * sampleRate / 1000);
         }
     }
     // Start AudioRecord before AudioTrack. This prevents AudioTrack from being
     // disabled due to buffer underrun while waiting for AudioRecord.
     if (mode != MUTED) {
-        record.start();
+        record->start();
         int16_t one;
         // FIXME this may not work any more
-        record.read(&one, sizeof(one));
+        record->read(&one, sizeof(one));
     }
     track->start();
 
@@ -898,12 +898,12 @@ bool AudioGroup::DeviceThread::threadLoop()
                 AudioRecord::Buffer buffer;
                 buffer.frameCount = toRead;
 
-                status_t status = record.obtainBuffer(&buffer, 1);
+                status_t status = record->obtainBuffer(&buffer, 1);
                 if (status == NO_ERROR) {
                     int offset = sampleCount - toRead;
                     memcpy(&input[offset], buffer.i8, buffer.size);
                     toRead -= buffer.frameCount;
-                    record.releaseBuffer(&buffer);
+                    record->releaseBuffer(&buffer);
                 } else if (status != TIMED_OUT && status != WOULD_BLOCK) {
                     ALOGE("cannot read from AudioRecord");
                     goto exit;
