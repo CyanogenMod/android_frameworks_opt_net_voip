@@ -50,6 +50,7 @@ public class SipProfile implements Parcelable, Serializable, Cloneable {
     private static final int DEFAULT_PORT = 5060;
     private static final String TCP = "TCP";
     private static final String UDP = "UDP";
+    private static final String TLS = "TLS";
     private Address mAddress;
     private String mProxyAddress;
     private String mPassword;
@@ -204,7 +205,7 @@ public class SipProfile implements Parcelable, Serializable, Cloneable {
 
         /**
          * Sets the protocol used to connect to the SIP server. Currently,
-         * only "UDP" and "TCP" are supported.
+         * only "UDP", "TCP" and "TLS" are supported.
          *
          * @param protocol the protocol string
          * @return this builder object
@@ -216,7 +217,7 @@ public class SipProfile implements Parcelable, Serializable, Cloneable {
                 throw new NullPointerException("protocol cannot be null");
             }
             protocol = protocol.toUpperCase();
-            if (!protocol.equals(UDP) && !protocol.equals(TCP)) {
+            if (!protocol.equals(UDP) && !protocol.equals(TCP) && !protocol.equals(TLS)) {
                 throw new IllegalArgumentException(
                         "unsupported protocol: " + protocol);
             }

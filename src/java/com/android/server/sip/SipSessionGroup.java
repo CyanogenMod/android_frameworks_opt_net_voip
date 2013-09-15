@@ -187,6 +187,8 @@ class SipSessionGroup implements SipListener {
         properties.setProperty("javax.sip.STACK_NAME", getStackName());
         properties.setProperty(
                 "gov.nist.javax.sip.THREAD_POOL_SIZE", THREAD_POOL_SIZE);
+        properties.setProperty(
+                "gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "TLSv1");
         mSipStack = SipFactory.getInstance().createSipStack(properties);
         try {
             SipProvider provider = mSipStack.createSipProvider(

@@ -128,6 +128,7 @@ class SipHelper {
     private ListeningPoint getListeningPoint() throws SipException {
         ListeningPoint lp = mSipProvider.getListeningPoint(ListeningPoint.UDP);
         if (lp == null) lp = mSipProvider.getListeningPoint(ListeningPoint.TCP);
+        if (lp == null) lp = mSipProvider.getListeningPoint(ListeningPoint.TLS);
         if (lp == null) {
             ListeningPoint[] lps = mSipProvider.getListeningPoints();
             if ((lps != null) && (lps.length > 0)) lp = lps[0];
