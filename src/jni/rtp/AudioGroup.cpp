@@ -936,7 +936,7 @@ exit:
 static jfieldID gNative;
 static jfieldID gMode;
 
-int add(JNIEnv *env, jobject thiz, jint mode,
+jlong add(JNIEnv *env, jobject thiz, jint mode,
     jint socket, jstring jRemoteAddress, jint remotePort,
     jstring jCodecSpec, jint dtmfType)
 {
@@ -992,7 +992,7 @@ int add(JNIEnv *env, jobject thiz, jint mode,
     codec = NULL;
 
     // Create audio group.
-    group = (AudioGroup *)env->GetIntField(thiz, gNative);
+    group = (AudioGroup *)env->GetLongField(thiz, gNative);
     if (!group) {
         int mode = env->GetIntField(thiz, gMode);
         group = new AudioGroup;
@@ -1011,32 +1011,32 @@ int add(JNIEnv *env, jobject thiz, jint mode,
     }
 
     // Succeed.
-    env->SetIntField(thiz, gNative, (int)group);
-    return (int)stream;
+    env->SetLongField(thiz, gNative, (jlong)group);
+    return (jlong)stream;
 
 error:
     delete group;
     delete stream;
     delete codec;
     close(socket);
-    env->SetIntField(thiz, gNative, 0);
+    env->SetLongField(thiz, gNative, 0);
     return 0;
 }
 
-void remove(JNIEnv *env, jobject thiz, jint stream)
+void remove(JNIEnv *env, jobject thiz, jlong stream)
 {
-    AudioGroup *group = (AudioGroup *)env->GetIntField(thiz, gNative);
+    AudioGroup *group = (AudioGroup *)env->GetLongField(thiz, gNative);
     if (group) {
         if (!stream || !group->remove((AudioStream *)stream)) {
             delete group;
-            env->SetIntField(thiz, gNative, 0);
+            env->SetLongField(thiz, gNative, 0);
         }
     }
 }
 
 void setMode(JNIEnv *env, jobject thiz, jint mode)
 {
-    AudioGroup *group = (AudioGroup *)env->GetIntField(thiz, gNative);
+    AudioGroup *group = (AudioGroup *)env->GetLongField(thiz, gNative);
     if (group && !group->setMode(mode)) {
         jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
     }
@@ -1044,15 +1044,15 @@ void setMode(JNIEnv *env, jobject thiz, jint mode)
 
 void sendDtmf(JNIEnv *env, jobject thiz, jint event)
 {
-    AudioGroup *group = (AudioGroup *)env->GetIntField(thiz, gNative);
+    AudioGroup *group = (AudioGroup *)env->GetLongField(thiz, gNative);
     if (group && !group->sendDtmf(event)) {
         jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
     }
 }
 
 JNINativeMethod gMethods[] = {
-    {"nativeAdd", "(IILjava/lang/String;ILjava/lang/String;I)I", (void *)add},
-    {"nativeRemove", "(I)V", (void *)remove},
+    {"nativeAdd", "(IILjava/lang/String;ILjava/lang/String;I)J", (void *)add},
+    {"nativeRemove", "(J)V", (void *)remove},
     {"nativeSetMode", "(I)V", (void *)setMode},
     {"nativeSendDtmf", "(I)V", (void *)sendDtmf},
 };
@@ -1069,7 +1069,7 @@ int registerAudioGroup(JNIEnv *env)
 
     jclass clazz;
     if ((clazz = env->FindClass("android/net/rtp/AudioGroup")) == NULL ||
-        (gNative = env->GetFieldID(clazz, "mNative", "I")) == NULL ||
+        (gNative = env->GetFieldID(clazz, "mNative", "J")) == NULL ||
         (gMode = env->GetFieldID(clazz, "mMode", "I")) == NULL ||
         env->RegisterNatives(clazz, gMethods, NELEM(gMethods)) < 0) {
         ALOGE("JNI registration failed");

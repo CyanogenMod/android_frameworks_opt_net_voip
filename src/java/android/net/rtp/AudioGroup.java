@@ -91,10 +91,10 @@ public class AudioGroup {
 
     private static final int MODE_LAST = 3;
 
-    private final Map<AudioStream, Integer> mStreams;
+    private final Map<AudioStream, Long> mStreams;
     private int mMode = MODE_ON_HOLD;
 
-    private int mNative;
+    private long mNative;
     static {
         System.loadLibrary("rtp_jni");
     }
@@ -103,7 +103,7 @@ public class AudioGroup {
      * Creates an empty AudioGroup.
      */
     public AudioGroup() {
-        mStreams = new HashMap<AudioStream, Integer>();
+        mStreams = new HashMap<AudioStream, Long>();
     }
 
     /**
@@ -149,7 +149,7 @@ public class AudioGroup {
                 AudioCodec codec = stream.getCodec();
                 String codecSpec = String.format(Locale.US, "%d %s %s", codec.type,
                         codec.rtpmap, codec.fmtp);
-                int id = nativeAdd(stream.getMode(), stream.getSocket(),
+                long id = nativeAdd(stream.getMode(), stream.getSocket(),
                         stream.getRemoteAddress().getHostAddress(),
                         stream.getRemotePort(), codecSpec, stream.getDtmfType());
                 mStreams.put(stream, id);
@@ -159,18 +159,18 @@ public class AudioGroup {
         }
     }
 
-    private native int nativeAdd(int mode, int socket, String remoteAddress,
+    private native long nativeAdd(int mode, int socket, String remoteAddress,
             int remotePort, String codecSpec, int dtmfType);
 
     // Package-private method used by AudioStream.join().
     synchronized void remove(AudioStream stream) {
-        Integer id = mStreams.remove(stream);
+        Long id = mStreams.remove(stream);
         if (id != null) {
             nativeRemove(id);
         }
     }
 
-    private native void nativeRemove(int id);
+    private native void nativeRemove(long id);
 
     /**
      * Sends a DTMF digit to every {@link AudioStream} in this group. Currently
@@ -200,7 +200,7 @@ public class AudioGroup {
 
     @Override
     protected void finalize() throws Throwable {
-        nativeRemove(0);
+        nativeRemove(0L);
         super.finalize();
     }
 }
