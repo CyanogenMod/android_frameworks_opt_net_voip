@@ -284,10 +284,10 @@ void AudioStream::encode(int tick, AudioStream *chain)
         if (duration >= 0 && duration < mSampleRate * DTMF_PERIOD) {
             duration += mSampleCount;
             int32_t buffer[4] = {
-                htonl(mDtmfMagic | mSequence),
-                htonl(mDtmfStart),
-                mSsrc,
-                htonl(mDtmfEvent | duration),
+                static_cast<int32_t>(htonl(mDtmfMagic | mSequence)),
+                static_cast<int32_t>(htonl(mDtmfStart)),
+                static_cast<int32_t>(mSsrc),
+                static_cast<int32_t>(htonl(mDtmfEvent | duration)),
             };
             if (duration >= mSampleRate * DTMF_PERIOD) {
                 buffer[3] |= htonl(1 << 23);
