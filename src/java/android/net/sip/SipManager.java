@@ -108,6 +108,17 @@ public class SipManager {
      */
     public static final String ACTION_SIP_REMOVE_PHONE =
             "com.android.phone.SIP_REMOVE_PHONE";
+
+    /**
+     * Action string for the SIP call option configuration changed intent.
+     * This is used to communicate  change to the SIP call option, triggering re-registration of
+     * the SIP phone accounts.
+     * Internal use only.
+     * @hide
+     */
+    public static final String ACTION_SIP_CALL_OPTION_CHANGED =
+            "com.android.phone.SIP_CALL_OPTION_CHANGED";
+
     /**
      * Part of the ACTION_SIP_ADD_PHONE and ACTION_SIP_REMOVE_PHONE intents.
      * Internal use only.
