@@ -17,7 +17,6 @@
 package android.net.rtp;
 
 import android.app.ActivityThread;
-import android.app.Application;
 import android.media.AudioManager;
 
 import java.util.HashMap;
@@ -154,7 +153,7 @@ public class AudioGroup {
                 long id = nativeAdd(stream.getMode(), stream.getSocket(),
                         stream.getRemoteAddress().getHostAddress(),
                         stream.getRemotePort(), codecSpec, stream.getDtmfType(),
-                        getMyOpPackageName());
+                        ActivityThread.currentOpPackageName());
                 mStreams.put(stream, id);
             } catch (NullPointerException e) {
                 throw new IllegalStateException(e);
@@ -205,16 +204,5 @@ public class AudioGroup {
     protected void finalize() throws Throwable {
         nativeRemove(0L);
         super.finalize();
-    }
-
-    private static String getMyOpPackageName() {
-        ActivityThread activityThread = ActivityThread.currentActivityThread();
-        if (activityThread != null) {
-            Application application = activityThread.getApplication();
-            if (application != null) {
-                return application.getOpPackageName();
-            }
-        }
-        throw new IllegalStateException("Cannot create AudioRecord outside of an app");
     }
 }
