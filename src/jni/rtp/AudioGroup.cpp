@@ -1059,7 +1059,7 @@ void sendDtmf(JNIEnv *env, jobject thiz, jint event)
 }
 
 JNINativeMethod gMethods[] = {
-    {"nativeAdd", "(IILjava/lang/String;ILjava/lang/String;I;LJava/lang/String;)J", (void *)add},
+    {"nativeAdd", "(IILjava/lang/String;ILjava/lang/String;ILjava/lang/String;)J", (void *)add},
     {"nativeRemove", "(J)V", (void *)remove},
     {"nativeSetMode", "(I)V", (void *)setMode},
     {"nativeSendDtmf", "(I)V", (void *)sendDtmf},
