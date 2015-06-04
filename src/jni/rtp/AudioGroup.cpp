@@ -837,7 +837,7 @@ bool AudioGroup::DeviceThread::threadLoop()
     // check if platform supports echo cancellation and do not active local echo suppression in
     // this case
     EchoSuppressor *echo = NULL;
-    AudioEffect *aec = NULL;
+    sp<AudioEffect> aec;
     if (mode == ECHO_SUPPRESSION) {
         if (mGroup->platformHasAec()) {
             aec = new AudioEffect(FX_IID_AEC,
@@ -852,12 +852,11 @@ bool AudioGroup::DeviceThread::threadLoop()
             if (status == NO_ERROR || status == ALREADY_EXISTS) {
                 aec->setEnabled(true);
             } else {
-                delete aec;
-                aec = NULL;
+                aec.clear();
             }
         }
         // Create local echo suppressor if platform AEC cannot be used.
-        if (aec == NULL) {
+        if (aec == 0) {
              echo = new EchoSuppressor(sampleCount,
                                        (track->latency() + record->latency()) * sampleRate / 1000);
         }
@@ -933,7 +932,6 @@ bool AudioGroup::DeviceThread::threadLoop()
 
 exit:
     delete echo;
-    delete aec;
     return true;
 }
 
