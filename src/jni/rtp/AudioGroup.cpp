@@ -502,7 +502,7 @@ private:
 
     int mMode;
     int mSampleRate;
-    int mSampleCount;
+    size_t mSampleCount;
     int mDeviceSocket;
     bool mPlatformHasAec;
 
@@ -786,7 +786,7 @@ bool AudioGroup::DeviceThread::threadLoop()
 {
     int mode = mGroup->mMode;
     int sampleRate = mGroup->mSampleRate;
-    int sampleCount = mGroup->mSampleCount;
+    size_t sampleCount = mGroup->mSampleCount;
     int deviceSocket = mGroup->mDeviceSocket;
 
     // Find out the frame count for AudioTrack and AudioRecord.
@@ -799,7 +799,7 @@ bool AudioGroup::DeviceThread::threadLoop()
         ALOGE("cannot compute frame count");
         return false;
     }
-    ALOGD("reported frame count: output %d, input %d", output, input);
+    ALOGD("reported frame count: output %zu, input %zu", output, input);
 
     if (output < sampleCount * 2) {
         output = sampleCount * 2;
@@ -807,7 +807,7 @@ bool AudioGroup::DeviceThread::threadLoop()
     if (input < sampleCount * 2) {
         input = sampleCount * 2;
     }
-    ALOGD("adjusted frame count: output %d, input %d", output, input);
+    ALOGD("adjusted frame count: output %zu, input %zu", output, input);
 
     // Initialize AudioTrack and AudioRecord.
     sp<AudioTrack> track = new AudioTrack();
