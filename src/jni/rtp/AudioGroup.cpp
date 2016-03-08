@@ -815,11 +815,11 @@ bool AudioGroup::DeviceThread::threadLoop()
     if (track->set(AUDIO_STREAM_VOICE_CALL, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_OUT_MONO, output, AUDIO_OUTPUT_FLAG_NONE, NULL /*callback_t*/,
                 NULL /*user*/, 0 /*notificationFrames*/, 0 /*sharedBuffer*/,
-                false /*threadCanCallJava*/, 0 /*sessionId*/,
+                false /*threadCanCallJava*/, AUDIO_SESSION_ALLOCATE,
                 AudioTrack::TRANSFER_OBTAIN) != NO_ERROR ||
             record->set(AUDIO_SOURCE_VOICE_COMMUNICATION, sampleRate, AUDIO_FORMAT_PCM_16_BIT,
                 AUDIO_CHANNEL_IN_MONO, input, NULL /*callback_t*/, NULL /*user*/,
-                0 /*notificationFrames*/, false /*threadCanCallJava*/, 0 /*sessionId*/,
+                0 /*notificationFrames*/, false /*threadCanCallJava*/, AUDIO_SESSION_ALLOCATE,
                 AudioRecord::TRANSFER_OBTAIN) != NO_ERROR) {
         ALOGE("cannot initialize audio device");
         return false;
