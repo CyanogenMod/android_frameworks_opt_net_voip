@@ -64,7 +64,7 @@ public final class SipService extends ISipService.Stub {
     static final boolean DBG = true;
     private static final int EXPIRY_TIME = 3600;
     private static final int SHORT_EXPIRY_TIME = 10;
-    private static final int MIN_EXPIRY_TIME = 60;
+    private static final int MIN_EXPIRY_TIME = 50;
     private static final int DEFAULT_KEEPALIVE_INTERVAL = 10; // in seconds
     private static final int DEFAULT_MAX_KEEPALIVE_INTERVAL = 120; // in seconds
 
@@ -1045,8 +1045,9 @@ public final class SipService extends ISipService.Stub {
 
                     if (!mRegistered) {
                         mRegistered = true;
+                        mBackoff = 1;
                         // allow some overlap to avoid call drop during renew
-                        duration -= MIN_EXPIRY_TIME;
+                        duration /= 2;
                         if (duration < MIN_EXPIRY_TIME) {
                             duration = MIN_EXPIRY_TIME;
                         }
