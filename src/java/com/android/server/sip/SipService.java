@@ -1046,6 +1046,7 @@ public final class SipService extends ISipService.Stub {
                     if (!mRegistered) {
                         mRegistered = true;
                         mBackoff = 1;
+                        
                         // allow some overlap to avoid call drop during renew
                         duration /= 2;
                         if (duration < MIN_EXPIRY_TIME) {
@@ -1080,9 +1081,9 @@ public final class SipService extends ISipService.Stub {
                 switch (errorCode) {
                     case SipErrorCode.INVALID_CREDENTIALS:
                     case SipErrorCode.SERVER_UNREACHABLE:
-                        if (SAR_DBG) log("   pause auto-registration");
-                        stop();
-                        break;
+                        //if (SAR_DBG) log("   pause auto-registration");
+                        //stop();
+                        //break;
                     default:
                         restartLater();
                 }
